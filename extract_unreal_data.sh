@@ -12,10 +12,10 @@ cd "$SCRIPT_DIR"
 
 # Introduction
 introduction() {
-	echo "\n${PURPLE}This script will extract and convert game data for ${GREEN}Unreal${PURPLE} or ${GREEN}Unreal Tournament${NC}.${NC}\n"
+	echo "\n${PURPLE}This script will extract and convert game data for ${GREEN}Unreal Gold${PURPLE} or ${GREEN}Unreal Tournament${NC}.${NC}\n"
 	echo "${PURPLE}Run the script in the same folder as the app.${NC}"
 	
-	echo "\n${PURPLE}If you already have ${GREEN}Unreal.iso${PURPLE} or ${GREEN}UT_GOTY_CD1.iso${PURPLE} make sure they are mounted.${NC}"
+	echo "\n${PURPLE}If you already have ${GREEN}UNREAL_GOLD.ISO${PURPLE} or ${GREEN}UT_GOTY_CD1.iso${PURPLE} make sure they are mounted.${NC}"
 	echo "${PURPLE}If you do not have them, you will be given an option to download.${NC}\n"
 }
 
@@ -60,10 +60,10 @@ check_data() {
 	if [ -d /Volumes/$1 ]; then
 		echo "${GREEN}$1 volume detected...${NC}"
 	elif [ -e $1.iso ]; then 
-		echo "${GREEN}$1.iso detected...${NC}"
+		echo "${GREEN}$1 iso detected...${NC}"
 		mount_iso $1
 	else
-		echo "${PURPLE}$1.iso not detected...${NC}"
+		echo "${PURPLE}$1 iso not detected...${NC}"
 		download_menu $1
 	fi
 }
@@ -94,10 +94,10 @@ copy_data() {
 	rm -rf $APP_SUPP/Sounds
 	rm -rf $APP_SUPP/Textures
 	
-	cp -R /Volumes/$ISO_NAME/Maps $APP_SUPP/Maps
-	cp -R /Volumes/$ISO_NAME/Music $APP_SUPP/Music
-	cp -R /Volumes/$ISO_NAME/Sounds $APP_SUPP/Sounds
-	cp -R /Volumes/$ISO_NAME/Textures $APP_SUPP/Textures
+	cp -R /Volumes/$ISO_NAME/MAPS $APP_SUPP/Maps
+	cp -R /Volumes/$ISO_NAME/MUSIC $APP_SUPP/Music
+	cp -R /Volumes/$ISO_NAME/SOUNDS $APP_SUPP/Sounds
+	cp -R /Volumes/$ISO_NAME/TEXTURES $APP_SUPP/Textures
 }
 
 remove_ut_fonts() {
@@ -125,8 +125,8 @@ main_menu() {
 		case $opt in
 			"Unreal")
 				BUNDLE_ID=Unreal
-				ISO_NAME=Unreal
-				URL=https://archive.org/download/gt-unreal-1998/Unreal.iso
+				ISO_NAME=UNREAL_GOLD
+				URL=https://archive.org/download/totallyunreal/UNREAL_GOLD.ISO
 				APP_SUPP=~/Library/Application\ Support/Unreal
 				detect_app $BUNDLE_ID
 				check_app_support $APP_SUPP
@@ -164,7 +164,7 @@ main_menu() {
 }
 
 download_menu() {
-	echo "\n${PURPLE}Since Unreal and Unreal Tournament are not currently available for sale, Epic has recommended specific isos to use that are available for download on Archive.org${NC}\n"
+	echo "\n${PURPLE}Since ${GREEN}$1${PURPLE} is not currently available for sale, Epic has recommended a specific iso to use that is available for download on Archive.org${NC}\n"
 	
 	
 	PS3='Would you like to download? '
