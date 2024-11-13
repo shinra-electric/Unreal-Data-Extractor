@@ -1,7 +1,7 @@
-# Unreal and Unreal Tournament Data Extractor
-Script for extracting game data for Unreal and Unreal Tournament '99 for macOS
+# Unreal Gold and Unreal Tournament Data Extractor
+Script for extracting game data for Unreal Gold and Unreal Tournament '99 for macOS
 
-[OldUnreal](https://github.com/OldUnreal) has been maintaining Unreal and Unreal Tournament for many years, with the help of Epic Games. But they do not have permission to provide the game data directly. 
+[OldUnreal](https://github.com/OldUnreal) has been maintaining Unreal and Unreal Tournament '99 for many years with the help of Epic Games. But they do not have permission to provide the game data directly. 
 
 Since the game data is currently not available for purchase, Epic have told OldUnreal that they are ok with certain ISOs on [Archive.org](https://archive.org) from which the user can extract the data themselves.
 
