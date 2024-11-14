@@ -61,8 +61,6 @@ check_data() {
 		echo "${GREEN}$1 volume detected...${NC}"
 	elif [ -e $1.iso ]; then 
 		echo "${GREEN}$1 iso detected...${NC}"
-		check_shasum $1
-		mount_iso $1
 	else
 		echo "${GREEN}$1${PURPLE} iso not detected...${NC}"
 		download_menu $1
@@ -156,6 +154,8 @@ main_menu() {
 				APP_SUPP=~/Library/Application\ Support/Unreal
 				check_app_support $APP_SUPP
 				check_data $ISO_NAME
+				check_shasum $ISO_NAME
+				mount_iso $ISO_NAME
 				copy_data $ISO_NAME
 				unmount_iso $ISO_NAME
 				cleanup_menu $ISO_NAME
@@ -171,6 +171,8 @@ main_menu() {
 				detect_app $BUNDLE_ID
 				check_app_support $APP_SUPP
 				check_data $ISO_NAME
+				check_shasum $ISO_NAME
+				mount_iso $ISO_NAME
 				copy_data $ISO_NAME
 				decompress_textures
 				unmount_iso $ISO_NAME
@@ -202,7 +204,6 @@ download_menu() {
 		case $opt in
 			"Download")
 				download_iso
-				mount_iso $1
 				break
 				;;
 			"Quit")
