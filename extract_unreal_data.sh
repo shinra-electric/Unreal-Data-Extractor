@@ -94,12 +94,12 @@ download_iso() {
 }
 
 mount_iso() {
-	echo "${PURPLE}Mounting ${GREEN}$1${NC}.iso...${NC}"
+	echo "${PURPLE}Mounting ${GREEN}$1${PURPLE}.iso...${NC}"
 	hdiutil attach $1.iso
 }
 
 unmount_iso() {
-	echo "${PURPLE}Unmounting ${GREEN}$1${NC}.iso...${NC}"
+	echo "${PURPLE}Unmounting ${GREEN}$1${PURPLE}.iso...${NC}"
 	hdiutil unmount /Volumes/$1
 }
 
@@ -123,12 +123,10 @@ copy_data() {
 		cp -R /Volumes/$1/Music $APP_SUPP/Music
 		cp -R /Volumes/$1/Sounds $APP_SUPP/Sounds
 		cp -R /Volumes/$1/Textures $APP_SUPP/Textures
+		
+		rm $APP_SUPP/Textures/UWindowFonts.utx
+		rm $APP_SUPP/Textures/LadderFonts.utx
 	fi
-}
-
-remove_ut_fonts() {
-	rm $APP_SUPP/Textures/UWindowFonts.utx
-	rm $APP_SUPP/Textures/LadderFonts.utx
 }
 
 decompress_textures() {
@@ -174,7 +172,6 @@ main_menu() {
 				check_app_support $APP_SUPP
 				check_data $ISO_NAME
 				copy_data $ISO_NAME
-				remove_ut_fonts
 				decompress_textures
 				unmount_iso $ISO_NAME
 				cleanup_menu $ISO_NAME
