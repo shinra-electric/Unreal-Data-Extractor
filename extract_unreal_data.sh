@@ -12,10 +12,10 @@ cd "$SCRIPT_DIR"
 
 # Introduction
 introduction() {
-	echo "\n${PURPLE}This script will extract and convert game data for ${GREEN}Unreal Gold${PURPLE} or ${GREEN}Unreal Tournament${NC}.${NC}\n"
-	echo "${PURPLE}Run the script in the same folder as the app.${NC}"
+	echo "\n${PURPLE}This script will download and extract game data for ${GREEN}Unreal Gold${PURPLE} or ${GREEN}Unreal Tournament${NC}.${NC}\n"
+	echo "${PURPLE}For ${GREEN}Unreal Tournament${NC} it also performs texture format conversion, so it must be run from the same folder as the app.${NC}"
 	
-	echo "\n${PURPLE}If you already have ${GREEN}UNREAL_GOLD.ISO${PURPLE} or ${GREEN}UT_GOTY_CD1.iso${PURPLE} make sure they are mounted.${NC}"
+	echo "\n${PURPLE}If you already have ${GREEN}UNREAL_GOLD.ISO${PURPLE} or ${GREEN}UT_GOTY_CD1.iso${PURPLE} place them in the same folder as the script as well.${NC}"
 	echo "${PURPLE}If you do not have them, you will be given an option to download.${NC}\n"
 }
 
@@ -31,7 +31,7 @@ check_app_support() {
 	if [ -d $1 ]; then 
 		echo "\n${PURPLE}An Application Support folder already exists${NC}"
 		echo "\n${RED}Continuing will overwrite any existing game data!${NC}"	
-		echo "\n${PURPLE}Note: User preferences will not be affected.${NC}"
+		echo "\n${PURPLE}Note: User preferences or saves will not be affected.${NC}"
 		
 		PS3='Would you like to continue? '
 		OPTIONS=(
@@ -61,10 +61,29 @@ check_data() {
 		echo "${GREEN}$1 volume detected...${NC}"
 	elif [ -e $1.iso ]; then 
 		echo "${GREEN}$1 iso detected...${NC}"
+		check_shasum $1
 		mount_iso $1
 	else
-		echo "${PURPLE}$1 iso not detected...${NC}"
+		echo "${GREEN}$1${PURPLE} iso not detected...${NC}"
 		download_menu $1
+	fi
+}
+
+check_shasum() {
+	ISO_SHASUM=$(shasum $1.iso | awk '{print $1}')
+	
+	if [ $? -ne 0 ]; then
+		echo "${RED}There was an issue checking the shasum of ${GREEN}$1.iso${NC}"	
+		exit 1
+	fi
+	
+	echo "${PURPLE}\nThe shasum of the detected iso is: \n${NC}$ISO_SHASUM"
+	
+	if [[ $ISO_SHASUM == $VERIFIED_SHASUM ]]; then
+		echo "${GREEN}A valid iso has been detected${NC}\n"
+	else 
+		echo "${RED}The shasum of the iso does not match the approved source.${NC}"
+		exit 1
 	fi
 }
 
@@ -75,12 +94,12 @@ download_iso() {
 }
 
 mount_iso() {
-	echo "${PURPLE}Mounting $1.iso...${NC}"
+	echo "${PURPLE}Mounting ${GREEN}$1${NC}.iso...${NC}"
 	hdiutil attach $1.iso
 }
 
 unmount_iso() {
-	echo "${PURPLE}Unmounting $1...${NC}"
+	echo "${PURPLE}Unmounting ${GREEN}$1${NC}.iso...${NC}"
 	hdiutil unmount /Volumes/$1
 }
 
@@ -94,10 +113,17 @@ copy_data() {
 	rm -rf $APP_SUPP/Sounds
 	rm -rf $APP_SUPP/Textures
 	
-	cp -R /Volumes/$ISO_NAME/MAPS $APP_SUPP/Maps
-	cp -R /Volumes/$ISO_NAME/MUSIC $APP_SUPP/Music
-	cp -R /Volumes/$ISO_NAME/SOUNDS $APP_SUPP/Sounds
-	cp -R /Volumes/$ISO_NAME/TEXTURES $APP_SUPP/Textures
+	if [[ $1 == "UNREAL_GOLD" ]]; then 
+		cp -R /Volumes/$1/MAPS $APP_SUPP/Maps
+		cp -R /Volumes/$1/MUSIC $APP_SUPP/Music
+		cp -R /Volumes/$1/SOUNDS $APP_SUPP/Sounds
+		cp -R /Volumes/$1/TEXTURES $APP_SUPP/Textures
+	else 
+		cp -R /Volumes/$1/Maps $APP_SUPP/Maps
+		cp -R /Volumes/$1/Music $APP_SUPP/Music
+		cp -R /Volumes/$1/Sounds $APP_SUPP/Sounds
+		cp -R /Volumes/$1/Textures $APP_SUPP/Textures
+	fi
 }
 
 remove_ut_fonts() {
@@ -124,11 +150,12 @@ main_menu() {
 	do
 		case $opt in
 			"Unreal")
+				GAME_NAME="Unreal Gold"
 				BUNDLE_ID=Unreal
 				ISO_NAME=UNREAL_GOLD
+				VERIFIED_SHASUM="7c310ca7a1fdd07aa68b67a1a04488d2b9dba2cd"
 				URL=https://archive.org/download/totallyunreal/UNREAL_GOLD.ISO
 				APP_SUPP=~/Library/Application\ Support/Unreal
-				detect_app $BUNDLE_ID
 				check_app_support $APP_SUPP
 				check_data $ISO_NAME
 				copy_data $ISO_NAME
@@ -137,8 +164,10 @@ main_menu() {
 				exit 0
 				;;
 			"Unreal Tournament")
+				GAME_NAME="Unreal Tournament"
 				BUNDLE_ID=UnrealTournament
 				ISO_NAME=UT_GOTY_CD1
+				VERIFIED_SHASUM="3f13d8a88620324f1cbf0a33029fc1d76c912821"
 				URL=https://archive.org/download/ut-goty/UT_GOTY_CD1.iso
 				APP_SUPP=~/Library/Application\ Support/Unreal\ Tournament
 				detect_app $BUNDLE_ID
@@ -164,7 +193,7 @@ main_menu() {
 }
 
 download_menu() {
-	echo "\n${PURPLE}Since ${GREEN}$1${PURPLE} is not currently available for sale, Epic has recommended a specific iso to use that is available for download on Archive.org${NC}\n"
+	echo "\n${PURPLE}Since ${GREEN}$GAME_NAME${PURPLE} is not currently available for sale, Epic has recommended a specific iso to use that is available for download on Archive.org${NC}\n"
 	
 	
 	PS3='Would you like to download? '
